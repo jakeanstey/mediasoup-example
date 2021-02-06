@@ -1,7 +1,6 @@
 const mediasoup = require('mediasoup');
 const fs = require('fs');
 const https = require('https');
-const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const config = require('./config');
@@ -48,16 +47,16 @@ async function runExpressApp() {
 }
 
 async function runWebServer() {
-  // const { sslKey, sslCrt } = config;
-  // if (!fs.existsSync(sslKey) || !fs.existsSync(sslCrt)) {
-  //   console.error('SSL files are not found. check your config.js file');
-  //   process.exit(0);
-  // }
-  // const tls = {
-  //   cert: fs.readFileSync(sslCrt),
-  //   key: fs.readFileSync(sslKey),
-  // };
-  webServer = http.createServer(expressApp); // https.createServer(tls, expressApp);
+  const { sslKey, sslCrt } = config;
+  if (!fs.existsSync(sslKey) || !fs.existsSync(sslCrt)) {
+    console.error('SSL files are not found. check your config.js file');
+    process.exit(0);
+  }
+  const tls = {
+    cert: fs.readFileSync(sslCrt),
+    key: fs.readFileSync(sslKey),
+  };
+  webServer = https.createServer(tls, expressApp);
   webServer.on('error', (err) => {
     console.error('starting web server failed:', err.message);
   });

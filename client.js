@@ -42,7 +42,7 @@ async function connect() {
     transports: ['websocket'],
   };
 
-  const serverUrl = `https://${hostname}:${config.listenPort}`;
+  const serverUrl = `http://${hostname}:${config.listenPort}`;
   socket = socketClient(serverUrl, opts);
   socket.request = socketPromise(socket);
 
@@ -82,6 +82,7 @@ async function loadDevice(routerRtpCapabilities) {
     }
   }
   await device.load({ routerRtpCapabilities });
+  console.log('Device loaded');
 }
 
 async function publish(e) {
@@ -158,6 +159,7 @@ async function publish(e) {
         videoGoogleStartBitrate : 1000
       };
     }
+    console.log(track);
     producer = await transport.produce(params);
   } catch (err) {
     $txtPublish.innerHTML = 'failed';
@@ -191,7 +193,9 @@ async function subscribe() {
     return;
   }
 
+  console.log('here');
   const transport = device.createRecvTransport(data);
+  console.log('TransportID:', transport.id);
   transport.on('connect', ({ dtlsParameters }, callback, errback) => {
     socket.request('connectConsumerTransport', {
       transportId: transport.id,
@@ -202,6 +206,7 @@ async function subscribe() {
   });
 
   transport.on('connectionstatechange', async (state) => {
+      console.log(state);
     switch (state) {
       case 'connecting':
         $txtSubscription.innerHTML = 'subscribing...';

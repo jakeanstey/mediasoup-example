@@ -1,6 +1,7 @@
 const mediasoup = require('mediasoup');
 const fs = require('fs');
 const https = require('https');
+const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const config = require('./config');
@@ -47,16 +48,16 @@ async function runExpressApp() {
 }
 
 async function runWebServer() {
-  const { sslKey, sslCrt } = config;
-  if (!fs.existsSync(sslKey) || !fs.existsSync(sslCrt)) {
-    console.error('SSL files are not found. check your config.js file');
-    process.exit(0);
-  }
-  const tls = {
-    cert: fs.readFileSync(sslCrt),
-    key: fs.readFileSync(sslKey),
-  };
-  webServer = https.createServer(tls, expressApp);
+  // const { sslKey, sslCrt } = config;
+  // if (!fs.existsSync(sslKey) || !fs.existsSync(sslCrt)) {
+  //   console.error('SSL files are not found. check your config.js file');
+  //   process.exit(0);
+  // }
+  // const tls = {
+  //   cert: fs.readFileSync(sslCrt),
+  //   key: fs.readFileSync(sslKey),
+  // };
+  webServer = http.createServer(expressApp); // https.createServer(tls, expressApp);
   webServer.on('error', (err) => {
     console.error('starting web server failed:', err.message);
   });
@@ -67,7 +68,7 @@ async function runWebServer() {
       const listenIps = config.mediasoup.webRtcTransport.listenIps[0];
       const ip = listenIps.announcedIp || listenIps.ip;
       console.log('server is running');
-      console.log(`open https://${ip}:${listenPort} in your web browser`);
+      console.log(`open http://${ip}:${listenPort} in your web browser`);
       resolve();
     });
   });
@@ -97,6 +98,7 @@ async function runSocketServer() {
     });
 
     socket.on('getRouterRtpCapabilities', (data, callback) => {
+        console.log('getRouterRtpCapabilities');
       callback(mediasoupRouter.rtpCapabilities);
     });
 
@@ -223,7 +225,7 @@ async function createConsumer(producer, rtpCapabilities) {
   if (consumer.type === 'simulcast') {
     await consumer.setPreferredLayers({ spatialLayer: 2, temporalLayer: 2 });
   }
-
+  console.log('sending consumer');
   return {
     producerId: producer.id,
     id: consumer.id,

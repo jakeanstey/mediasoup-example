@@ -40,9 +40,10 @@ async function connect() {
   const opts = {
     path: '/server',
     transports: ['websocket'],
+    secure: true
   };
 
-  const serverUrl = `http://${hostname}:${config.listenPort}`;
+  const serverUrl = `https://${hostname}:${config.listenPort}`;
   socket = socketClient(serverUrl, opts);
   socket.request = socketPromise(socket);
 

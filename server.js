@@ -47,7 +47,7 @@ async function runExpressApp() {
 }
 
 async function runWebServer() {
-  const { sslKey, sslCrt } = config;
+  const { sslKey, sslCrt, sslCA } = config;
   if (!fs.existsSync(sslKey) || !fs.existsSync(sslCrt)) {
     console.error('SSL files are not found. check your config.js file');
     process.exit(0);
@@ -55,6 +55,7 @@ async function runWebServer() {
   const tls = {
     cert: fs.readFileSync(sslCrt),
     key: fs.readFileSync(sslKey),
+    ca: fs.readFileSync(sslCA)
   };
   webServer = https.createServer(tls, expressApp);
   webServer.on('error', (err) => {

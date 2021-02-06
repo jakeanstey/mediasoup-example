@@ -3,6 +3,7 @@ module.exports = {
   listenPort: 3000,
   sslCrt: './data/server.cert',
   sslKey: './data/server.key',
+  sslCA: './data/ca.crt',
   mediasoup: {
     // Worker settings
     worker: {
